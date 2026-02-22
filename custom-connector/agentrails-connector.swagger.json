@@ -1,0 +1,1243 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "AgentRails",
+    "description": "Manage AI agents, x402 payments, and blockchain infrastructure from Power Platform. AgentRails enables autonomous AI agents to make USDC payments via the x402 protocol.",
+    "version": "1.0.0",
+    "contact": {
+      "name": "AgentRails Support",
+      "url": "https://www.agentrails.io",
+      "email": "support@agentrails.io"
+    }
+  },
+  "host": "api.agentrails.io",
+  "basePath": "/",
+  "schemes": ["https"],
+  "consumes": ["application/json"],
+  "produces": ["application/json"],
+  "securityDefinitions": {
+    "apiKey": {
+      "type": "apiKey",
+      "name": "X-API-Key",
+      "in": "header",
+      "description": "AgentRails API key (starts with ar_test_ or ar_live_)"
+    }
+  },
+  "security": [
+    {
+      "apiKey": []
+    }
+  ],
+  "paths": {
+    "/api/agents": {
+      "get": {
+        "operationId": "ListAgents",
+        "summary": "List all agents",
+        "description": "Returns all registered AI agents for your organization with their status, budget, balance, and wallet address.",
+        "x-ms-visibility": "important",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Agent"
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "operationId": "CreateAgent",
+        "summary": "Create a new agent",
+        "description": "Register a new AI agent with a name, description, and USDC spending budget.",
+        "x-ms-visibility": "important",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/CreateAgentRequest"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Agent created",
+            "schema": {
+              "$ref": "#/definitions/Agent"
+            }
+          }
+        }
+      }
+    },
+    "/api/agents/{agentId}/info": {
+      "get": {
+        "operationId": "GetAgentInfo",
+        "summary": "Get agent details",
+        "description": "Returns detailed information about a specific agent including status, budget, remaining balance, and wallet address.",
+        "parameters": [
+          {
+            "name": "agentId",
+            "in": "path",
+            "type": "string",
+            "required": true,
+            "description": "Agent identifier (e.g. agent_7bda...)",
+            "x-ms-summary": "Agent ID"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "schema": {
+              "$ref": "#/definitions/Agent"
+            }
+          },
+          "404": {
+            "description": "Agent not found"
+          }
+        }
+      }
+    },
+    "/api/agents/{agentId}/run": {
+      "post": {
+        "operationId": "RunAgent",
+        "summary": "Execute agent task",
+        "description": "Send a task to an AI agent for execution. The agent processes the task and returns a result with status, output text, and USDC spent.",
+        "x-ms-visibility": "important",
+        "parameters": [
+          {
+            "name": "agentId",
+            "in": "path",
+            "type": "string",
+            "required": true,
+            "description": "Agent identifier",
+            "x-ms-summary": "Agent ID"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/RunAgentRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Task executed",
+            "schema": {
+              "$ref": "#/definitions/RunAgentResult"
+            }
+          },
+          "404": {
+            "description": "Agent not found"
+          }
+        }
+      }
+    },
+    "/api/agents/dashboard": {
+      "get": {
+        "operationId": "GetAgentDashboard",
+        "summary": "Get agent dashboard",
+        "description": "Returns all agents with aggregate statistics: total agents, active agents, total budget allocated, and total USDC spent.",
+        "x-ms-visibility": "important",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "schema": {
+              "$ref": "#/definitions/AgentDashboard"
+            }
+          }
+        }
+      }
+    },
+    "/api/agents/{agentId}": {
+      "delete": {
+        "operationId": "DeleteAgent",
+        "summary": "Delete an agent",
+        "description": "Permanently delete a registered agent.",
+        "parameters": [
+          {
+            "name": "agentId",
+            "in": "path",
+            "type": "string",
+            "required": true,
+            "description": "Agent identifier",
+            "x-ms-summary": "Agent ID"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Agent deleted",
+            "schema": {
+              "$ref": "#/definitions/MessageResponse"
+            }
+          },
+          "404": {
+            "description": "Agent not found"
+          }
+        }
+      }
+    },
+    "/api/agents/transactions": {
+      "get": {
+        "operationId": "GetAgentTransactions",
+        "summary": "Get agent transactions",
+        "description": "Returns transactions for all agents in your organization.",
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "type": "integer",
+            "required": false,
+            "default": 100,
+            "description": "Maximum number of transactions to return",
+            "x-ms-summary": "Limit"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/AgentTransaction"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/x402/stats": {
+      "get": {
+        "operationId": "GetPaymentStats",
+        "summary": "Get payment statistics",
+        "description": "Returns x402 payment statistics including total payments processed, total USDC volume, settled count, and failed count with per-network breakdown.",
+        "x-ms-visibility": "important",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "schema": {
+              "$ref": "#/definitions/PaymentStats"
+            }
+          }
+        }
+      }
+    },
+    "/api/x402/payments": {
+      "get": {
+        "operationId": "GetPayments",
+        "summary": "List x402 payments",
+        "description": "Returns recent x402 payments with filtering options for network and status.",
+        "x-ms-visibility": "important",
+        "parameters": [
+          {
+            "name": "network",
+            "in": "query",
+            "type": "string",
+            "required": false,
+            "description": "Filter by CAIP-2 network ID (e.g. eip155:8453 for Base)",
+            "x-ms-summary": "Network"
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "type": "string",
+            "required": false,
+            "description": "Filter by status: settled, pending, or failed",
+            "x-ms-summary": "Status",
+            "enum": ["settled", "pending", "failed"]
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "type": "integer",
+            "required": false,
+            "default": 50,
+            "description": "Maximum number of payments to return (max: 500)",
+            "x-ms-summary": "Limit"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "schema": {
+              "$ref": "#/definitions/PaymentHistory"
+            }
+          }
+        }
+      }
+    },
+    "/api/x402/pricing": {
+      "get": {
+        "operationId": "GetPricing",
+        "summary": "Get endpoint pricing",
+        "description": "Returns pricing information for all x402-protected API endpoints, supported blockchain networks, and the recipient wallet address.",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "schema": {
+              "$ref": "#/definitions/PricingInfo"
+            }
+          }
+        }
+      }
+    },
+    "/api/transactions/balance/total": {
+      "get": {
+        "operationId": "GetTotalBalance",
+        "summary": "Get total USDC balance",
+        "description": "Returns the total USDC wallet balance across all blockchain networks.",
+        "x-ms-visibility": "important",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "schema": {
+              "$ref": "#/definitions/TotalBalance"
+            }
+          }
+        }
+      }
+    },
+    "/api/transactions/balance/by-chain": {
+      "get": {
+        "operationId": "GetBalanceByChain",
+        "summary": "Get balance by chain",
+        "description": "Returns USDC balance broken down by blockchain network.",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "schema": {
+              "$ref": "#/definitions/ChainBalances"
+            }
+          }
+        }
+      }
+    },
+    "/api/transactions/chains": {
+      "get": {
+        "operationId": "GetSupportedChains",
+        "summary": "Get supported chains",
+        "description": "Returns the list of blockchain networks supported for USDC settlement.",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "schema": {
+              "$ref": "#/definitions/SupportedChains"
+            }
+          }
+        }
+      }
+    },
+    "/api/billing/usage": {
+      "get": {
+        "operationId": "GetBillingUsage",
+        "summary": "Get billing usage",
+        "description": "Returns billing usage for the current period including transaction count, USDC volume, and fees.",
+        "x-ms-visibility": "important",
+        "parameters": [
+          {
+            "name": "days",
+            "in": "query",
+            "type": "integer",
+            "required": false,
+            "default": 30,
+            "description": "Number of days to include (default: 30)",
+            "x-ms-summary": "Days"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "schema": {
+              "$ref": "#/definitions/BillingUsage"
+            }
+          }
+        }
+      }
+    },
+    "/api/org-policies": {
+      "get": {
+        "operationId": "ListPolicies",
+        "summary": "List spending policies",
+        "description": "Returns all organization spending policies that control agent transaction limits, daily caps, and approval requirements.",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Policy"
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "operationId": "CreatePolicy",
+        "summary": "Create spending policy",
+        "description": "Create a new spending policy to control agent transaction limits and approval workflows.",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/CreatePolicyRequest"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Policy created",
+            "schema": {
+              "$ref": "#/definitions/Policy"
+            }
+          }
+        }
+      }
+    },
+    "/api/org-policies/{id}": {
+      "get": {
+        "operationId": "GetPolicy",
+        "summary": "Get policy details",
+        "description": "Returns details for a specific spending policy.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "type": "string",
+            "required": true,
+            "description": "Policy identifier (GUID)",
+            "x-ms-summary": "Policy ID"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "schema": {
+              "$ref": "#/definitions/Policy"
+            }
+          }
+        }
+      },
+      "put": {
+        "operationId": "UpdatePolicy",
+        "summary": "Update spending policy",
+        "description": "Update an existing spending policy.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "type": "string",
+            "required": true,
+            "description": "Policy identifier (GUID)",
+            "x-ms-summary": "Policy ID"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/CreatePolicyRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Policy updated",
+            "schema": {
+              "$ref": "#/definitions/MessageResponse"
+            }
+          }
+        }
+      },
+      "delete": {
+        "operationId": "DeletePolicy",
+        "summary": "Delete spending policy",
+        "description": "Delete a spending policy.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "type": "string",
+            "required": true,
+            "description": "Policy identifier (GUID)",
+            "x-ms-summary": "Policy ID"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Policy deleted",
+            "schema": {
+              "$ref": "#/definitions/MessageResponse"
+            }
+          }
+        }
+      }
+    },
+    "/api/org-policies/{id}/toggle": {
+      "post": {
+        "operationId": "TogglePolicy",
+        "summary": "Enable/disable policy",
+        "description": "Toggle a spending policy on or off.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "type": "string",
+            "required": true,
+            "description": "Policy identifier (GUID)",
+            "x-ms-summary": "Policy ID"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "enabled": {
+                  "type": "boolean",
+                  "description": "Whether the policy is now enabled"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/logs": {
+      "get": {
+        "operationId": "GetLogs",
+        "summary": "Get execution logs",
+        "description": "Returns recent execution logs. Optionally filter by log level.",
+        "parameters": [
+          {
+            "name": "level",
+            "in": "query",
+            "type": "string",
+            "required": false,
+            "description": "Filter by level: Information, Warning, or Error",
+            "x-ms-summary": "Level",
+            "enum": ["Information", "Warning", "Error"]
+          },
+          {
+            "name": "count",
+            "in": "query",
+            "type": "integer",
+            "required": false,
+            "default": 100,
+            "description": "Maximum entries to return",
+            "x-ms-summary": "Count"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/LogEntry"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/logs/errors": {
+      "get": {
+        "operationId": "GetErrorLogs",
+        "summary": "Get error logs",
+        "description": "Returns only error-level logs from recent executions.",
+        "parameters": [
+          {
+            "name": "count",
+            "in": "query",
+            "type": "integer",
+            "required": false,
+            "default": 50,
+            "description": "Maximum entries to return",
+            "x-ms-summary": "Count"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/LogEntry"
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "Agent": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Agent identifier",
+          "x-ms-summary": "Agent ID"
+        },
+        "name": {
+          "type": "string",
+          "description": "Agent display name",
+          "x-ms-summary": "Name"
+        },
+        "description": {
+          "type": "string",
+          "description": "What this agent does",
+          "x-ms-summary": "Description"
+        },
+        "status": {
+          "type": "string",
+          "description": "Current status: Active, Working, Paused, Error, or Deleted",
+          "x-ms-summary": "Status"
+        },
+        "budget": {
+          "type": "number",
+          "description": "Maximum USDC budget allocated",
+          "x-ms-summary": "Budget (USDC)"
+        },
+        "currentBalance": {
+          "type": "number",
+          "description": "Remaining USDC balance",
+          "x-ms-summary": "Balance (USDC)"
+        },
+        "walletAddress": {
+          "type": "string",
+          "description": "Ethereum wallet address",
+          "x-ms-summary": "Wallet Address"
+        },
+        "transactionCount": {
+          "type": "integer",
+          "description": "Completed transaction count",
+          "x-ms-summary": "Transactions"
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "ISO 8601 creation timestamp",
+          "x-ms-summary": "Created"
+        },
+        "lastActiveAt": {
+          "type": "string",
+          "description": "ISO 8601 last activity timestamp",
+          "x-ms-summary": "Last Active"
+        }
+      }
+    },
+    "CreateAgentRequest": {
+      "type": "object",
+      "required": ["name"],
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Name for the new agent",
+          "x-ms-summary": "Name"
+        },
+        "description": {
+          "type": "string",
+          "description": "What this agent will do",
+          "x-ms-summary": "Description"
+        },
+        "budgetUsdc": {
+          "type": "number",
+          "description": "USDC budget to allocate (default: 1.00)",
+          "x-ms-summary": "Budget (USDC)"
+        }
+      }
+    },
+    "RunAgentRequest": {
+      "type": "object",
+      "required": ["task"],
+      "properties": {
+        "task": {
+          "type": "string",
+          "description": "Task description for the agent to execute",
+          "x-ms-summary": "Task"
+        }
+      }
+    },
+    "RunAgentResult": {
+      "type": "object",
+      "properties": {
+        "agentId": {
+          "type": "string",
+          "description": "Agent that executed the task",
+          "x-ms-summary": "Agent ID"
+        },
+        "taskDescription": {
+          "type": "string",
+          "description": "Task that was executed",
+          "x-ms-summary": "Task"
+        },
+        "success": {
+          "type": "boolean",
+          "description": "Whether the task completed successfully",
+          "x-ms-summary": "Success"
+        },
+        "result": {
+          "type": "string",
+          "description": "Agent execution result text",
+          "x-ms-summary": "Result"
+        },
+        "amountSpent": {
+          "type": "number",
+          "description": "USDC spent executing this task",
+          "x-ms-summary": "Amount Spent (USDC)"
+        },
+        "startedAt": {
+          "type": "string",
+          "description": "Execution start timestamp",
+          "x-ms-summary": "Started"
+        },
+        "completedAt": {
+          "type": "string",
+          "description": "Execution completion timestamp",
+          "x-ms-summary": "Completed"
+        },
+        "errorMessage": {
+          "type": "string",
+          "description": "Error message if task failed",
+          "x-ms-summary": "Error"
+        }
+      }
+    },
+    "AgentDashboard": {
+      "type": "object",
+      "properties": {
+        "agents": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Agent"
+          },
+          "description": "List of all agents"
+        },
+        "summary": {
+          "type": "object",
+          "properties": {
+            "totalAgents": {
+              "type": "integer",
+              "description": "Total registered agents",
+              "x-ms-summary": "Total Agents"
+            },
+            "activeAgents": {
+              "type": "integer",
+              "description": "Currently active agents",
+              "x-ms-summary": "Active Agents"
+            },
+            "totalBudget": {
+              "type": "number",
+              "description": "Sum of all agent budgets in USDC",
+              "x-ms-summary": "Total Budget (USDC)"
+            },
+            "totalSpent": {
+              "type": "number",
+              "description": "Sum of all agent spending in USDC",
+              "x-ms-summary": "Total Spent (USDC)"
+            }
+          }
+        }
+      }
+    },
+    "AgentTransaction": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Transaction identifier",
+          "x-ms-summary": "ID"
+        },
+        "agentId": {
+          "type": "string",
+          "description": "Agent that made the transaction",
+          "x-ms-summary": "Agent ID"
+        },
+        "transactionId": {
+          "type": "string",
+          "description": "Blockchain transaction ID",
+          "x-ms-summary": "Transaction ID"
+        },
+        "amount": {
+          "type": "number",
+          "description": "USDC amount",
+          "x-ms-summary": "Amount (USDC)"
+        },
+        "recipientAddress": {
+          "type": "string",
+          "description": "Payment recipient wallet",
+          "x-ms-summary": "Recipient"
+        },
+        "status": {
+          "type": "string",
+          "description": "Transaction status",
+          "x-ms-summary": "Status"
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "Transaction creation timestamp",
+          "x-ms-summary": "Created"
+        },
+        "completedAt": {
+          "type": "string",
+          "description": "Transaction completion timestamp",
+          "x-ms-summary": "Completed"
+        }
+      }
+    },
+    "PaymentStats": {
+      "type": "object",
+      "properties": {
+        "totalPayments": {
+          "type": "integer",
+          "description": "Total x402 payments processed",
+          "x-ms-summary": "Total Payments"
+        },
+        "totalVolumeUsdc": {
+          "type": "number",
+          "description": "Total USDC volume",
+          "x-ms-summary": "Volume (USDC)"
+        },
+        "settledPayments": {
+          "type": "integer",
+          "description": "Successfully settled payments",
+          "x-ms-summary": "Settled"
+        },
+        "failedPayments": {
+          "type": "integer",
+          "description": "Failed payments",
+          "x-ms-summary": "Failed"
+        },
+        "networkBreakdown": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "network": {
+                "type": "string",
+                "description": "Network ID",
+                "x-ms-summary": "Network"
+              },
+              "payments": {
+                "type": "integer",
+                "description": "Payment count",
+                "x-ms-summary": "Payments"
+              },
+              "volumeUsdc": {
+                "type": "number",
+                "description": "USDC volume",
+                "x-ms-summary": "Volume"
+              }
+            }
+          },
+          "description": "Per-network statistics"
+        }
+      }
+    },
+    "PaymentHistory": {
+      "type": "object",
+      "properties": {
+        "totalCount": {
+          "type": "integer",
+          "description": "Total payments matching filter",
+          "x-ms-summary": "Total Count"
+        },
+        "returnedCount": {
+          "type": "integer",
+          "description": "Payments returned in this response",
+          "x-ms-summary": "Returned Count"
+        },
+        "payments": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Payment"
+          },
+          "description": "Payment records"
+        }
+      }
+    },
+    "Payment": {
+      "type": "object",
+      "properties": {
+        "paymentId": {
+          "type": "string",
+          "description": "Payment identifier",
+          "x-ms-summary": "Payment ID"
+        },
+        "resource": {
+          "type": "string",
+          "description": "API endpoint that was paid for",
+          "x-ms-summary": "Resource"
+        },
+        "network": {
+          "type": "string",
+          "description": "Blockchain network (CAIP-2)",
+          "x-ms-summary": "Network"
+        },
+        "amountUsdc": {
+          "type": "number",
+          "description": "Payment amount in USDC",
+          "x-ms-summary": "Amount (USDC)"
+        },
+        "payerAddress": {
+          "type": "string",
+          "description": "Payer wallet address",
+          "x-ms-summary": "Payer"
+        },
+        "recipientAddress": {
+          "type": "string",
+          "description": "Recipient wallet address",
+          "x-ms-summary": "Recipient"
+        },
+        "transactionHash": {
+          "type": "string",
+          "description": "On-chain transaction hash",
+          "x-ms-summary": "Transaction Hash"
+        },
+        "status": {
+          "type": "string",
+          "description": "Payment status: settled, pending, or failed",
+          "x-ms-summary": "Status"
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "Payment creation timestamp",
+          "x-ms-summary": "Created"
+        },
+        "settledAt": {
+          "type": "string",
+          "description": "Settlement timestamp",
+          "x-ms-summary": "Settled"
+        }
+      }
+    },
+    "PricingInfo": {
+      "type": "object",
+      "properties": {
+        "endpoints": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "resource": {
+                "type": "string",
+                "description": "API endpoint path",
+                "x-ms-summary": "Endpoint"
+              },
+              "amountUsdc": {
+                "type": "number",
+                "description": "Price in USDC per request",
+                "x-ms-summary": "Price (USDC)"
+              },
+              "description": {
+                "type": "string",
+                "description": "Endpoint description",
+                "x-ms-summary": "Description"
+              }
+            }
+          },
+          "description": "Priced endpoints"
+        },
+        "supportedNetworks": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "CAIP-2 network identifiers"
+        },
+        "payTo": {
+          "type": "string",
+          "description": "Recipient wallet address",
+          "x-ms-summary": "Pay To Address"
+        }
+      }
+    },
+    "TotalBalance": {
+      "type": "object",
+      "properties": {
+        "totalBalance": {
+          "type": "number",
+          "description": "Total USDC balance across all chains",
+          "x-ms-summary": "Total Balance (USDC)"
+        },
+        "currency": {
+          "type": "string",
+          "description": "Currency (USDC)",
+          "x-ms-summary": "Currency"
+        },
+        "source": {
+          "type": "string",
+          "description": "Balance data source",
+          "x-ms-summary": "Source"
+        }
+      }
+    },
+    "ChainBalances": {
+      "type": "object",
+      "properties": {
+        "balances": {
+          "type": "object",
+          "description": "Balance per chain (key: chain name, value: USDC amount)"
+        },
+        "total": {
+          "type": "number",
+          "description": "Total across all chains",
+          "x-ms-summary": "Total (USDC)"
+        },
+        "currency": {
+          "type": "string",
+          "description": "Currency (USDC)",
+          "x-ms-summary": "Currency"
+        },
+        "source": {
+          "type": "string",
+          "description": "Balance data source",
+          "x-ms-summary": "Source"
+        }
+      }
+    },
+    "SupportedChains": {
+      "type": "object",
+      "properties": {
+        "supportedChains": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "List of supported blockchain networks"
+        },
+        "count": {
+          "type": "integer",
+          "description": "Number of supported chains",
+          "x-ms-summary": "Count"
+        }
+      }
+    },
+    "BillingUsage": {
+      "type": "object",
+      "properties": {
+        "organization": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string",
+              "description": "Organization ID",
+              "x-ms-summary": "Org ID"
+            },
+            "tier": {
+              "type": "string",
+              "description": "Account tier",
+              "x-ms-summary": "Tier"
+            }
+          }
+        },
+        "period": {
+          "type": "object",
+          "properties": {
+            "from": {
+              "type": "string",
+              "description": "Period start date",
+              "x-ms-summary": "From"
+            },
+            "to": {
+              "type": "string",
+              "description": "Period end date",
+              "x-ms-summary": "To"
+            },
+            "days": {
+              "type": "integer",
+              "description": "Days in period",
+              "x-ms-summary": "Days"
+            }
+          }
+        },
+        "usage": {
+          "type": "object",
+          "properties": {
+            "transactionCount": {
+              "type": "integer",
+              "description": "Transactions in period",
+              "x-ms-summary": "Transaction Count"
+            },
+            "totalVolumeUsdc": {
+              "type": "number",
+              "description": "USDC volume in period",
+              "x-ms-summary": "Volume (USDC)"
+            },
+            "totalFeesUsd": {
+              "type": "number",
+              "description": "Total platform fees",
+              "x-ms-summary": "Total Fees (USD)"
+            },
+            "billedFeesUsd": {
+              "type": "number",
+              "description": "Already billed fees",
+              "x-ms-summary": "Billed (USD)"
+            },
+            "unbilledFeesUsd": {
+              "type": "number",
+              "description": "Pending unbilled fees",
+              "x-ms-summary": "Unbilled (USD)"
+            }
+          }
+        }
+      }
+    },
+    "Policy": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Policy identifier (GUID)",
+          "x-ms-summary": "Policy ID"
+        },
+        "name": {
+          "type": "string",
+          "description": "Policy name",
+          "x-ms-summary": "Name"
+        },
+        "description": {
+          "type": "string",
+          "description": "Policy description",
+          "x-ms-summary": "Description"
+        },
+        "maxTransactionAmount": {
+          "type": "number",
+          "description": "Max USDC per transaction",
+          "x-ms-summary": "Max Transaction (USDC)"
+        },
+        "dailySpendingLimit": {
+          "type": "number",
+          "description": "Daily USDC spending cap",
+          "x-ms-summary": "Daily Limit (USDC)"
+        },
+        "requiresApproval": {
+          "type": "boolean",
+          "description": "Whether transactions require approval",
+          "x-ms-summary": "Requires Approval"
+        },
+        "allowedRecipients": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Allowed recipient wallet addresses"
+        },
+        "agentIds": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Agents this policy applies to"
+        },
+        "enabled": {
+          "type": "boolean",
+          "description": "Whether the policy is active",
+          "x-ms-summary": "Enabled"
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "Creation timestamp",
+          "x-ms-summary": "Created"
+        }
+      }
+    },
+    "CreatePolicyRequest": {
+      "type": "object",
+      "required": ["name"],
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Policy name",
+          "x-ms-summary": "Name"
+        },
+        "description": {
+          "type": "string",
+          "description": "Policy description",
+          "x-ms-summary": "Description"
+        },
+        "maxTransactionAmount": {
+          "type": "number",
+          "description": "Max USDC per transaction (0 = unlimited)",
+          "x-ms-summary": "Max Transaction (USDC)"
+        },
+        "dailySpendingLimit": {
+          "type": "number",
+          "description": "Daily USDC spending cap (0 = unlimited)",
+          "x-ms-summary": "Daily Limit (USDC)"
+        },
+        "requiresApproval": {
+          "type": "boolean",
+          "description": "Require approval for transactions",
+          "x-ms-summary": "Requires Approval"
+        },
+        "allowedRecipients": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Whitelist of recipient wallet addresses"
+        },
+        "agentIds": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Agent IDs this policy applies to (empty = all)"
+        }
+      }
+    },
+    "LogEntry": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "integer",
+          "description": "Log entry ID",
+          "x-ms-summary": "ID"
+        },
+        "timestamp": {
+          "type": "string",
+          "description": "Log timestamp",
+          "x-ms-summary": "Timestamp"
+        },
+        "level": {
+          "type": "string",
+          "description": "Log level: Information, Warning, or Error",
+          "x-ms-summary": "Level"
+        },
+        "message": {
+          "type": "string",
+          "description": "Log message",
+          "x-ms-summary": "Message"
+        },
+        "source": {
+          "type": "string",
+          "description": "Source component",
+          "x-ms-summary": "Source"
+        },
+        "requestPath": {
+          "type": "string",
+          "description": "Associated HTTP request path",
+          "x-ms-summary": "Request Path"
+        }
+      }
+    },
+    "MessageResponse": {
+      "type": "object",
+      "properties": {
+        "message": {
+          "type": "string",
+          "description": "Response message",
+          "x-ms-summary": "Message"
+        }
+      }
+    }
+  }
+}

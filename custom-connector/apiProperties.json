@@ -1,0 +1,22 @@
+{
+  "properties": {
+    "connectionParameters": {
+      "api_key": {
+        "type": "securestring",
+        "uiDefinition": {
+          "displayName": "API Key",
+          "description": "Your AgentRails API key (starts with ar_test_ or ar_live_)",
+          "tooltip": "Get your API key from https://app.agentrails.io or POST to /api/signup",
+          "constraints": {
+            "required": "true",
+            "tabIndex": 1
+          }
+        }
+      }
+    },
+    "iconBrandColor": "#6366f1",
+    "capabilities": [],
+    "publisher": "AgentRails",
+    "stackOwner": "AgentRails"
+  }
+}
