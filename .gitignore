@@ -1,0 +1,335 @@
+# ----------------------------------------------------------------------------
+# Ignore Pattern Examples (reference templates)
+# ----------------------------------------------------------------------------
+# Keep these commented unless you want to activate them.
+# Rules are evaluated top-to-bottom; last matching rule wins.
+#
+# 1) Root-only file type rules
+# Ignore only root-level .log files:
+# /*.log
+#
+# Include only root-level .json after broad ignore:
+# *.json
+# !/*.json
+#
+# 2) Specific file depth rules
+# Include level-1 files under reports/:
+# !/reports/*.json
+#
+# Include level-2 files under reports/:
+# !/reports/*/*.json
+#
+# Include level-3 files under reports/:
+# !/reports/*/*/*.json
+#
+# 3) Directory-level allowlist (ignore everything else in that directory tree)
+# Ignore everything in exports/:
+# /exports/**
+#
+# Re-include the directory itself so child patterns can apply:
+# !/exports/
+#
+# Re-include only selected file types (all others remain ignored):
+# !/exports/**/*.csv
+# !/exports/**/*.md
+#
+# 4) Directory-level blocklist by file type
+# Ignore all .tmp files only inside cache/ at any depth:
+# /cache/**/*.tmp
+#
+# 5) Validate pattern behavior
+# git check-ignore -v path/to/file
+
+# 6) Root-only directory rules
+# Ignore only root-level directories:
+# /build/
+# /cache/
+#
+# 7) Directory-name rules at any depth
+# Ignore any directory named cache anywhere in the repository:
+# cache/
+#
+# 8) Specific directory depth rules
+# Ignore only level-1 directories under snapshots/:
+# /snapshots/*/
+#
+# Ignore only level-2 directories under snapshots/:
+# /snapshots/*/*/
+#
+# 9) Directory allowlist at a specific level
+# Ignore all first-level directories under assets/:
+# /assets/*/
+#
+# Re-include only selected directories:
+# !/assets/images/
+# !/assets/icons/
+#
+# 10) Keep directory structure only (ignore all files)
+# Ignore everything under skeleton/:
+# /skeleton/**
+#
+# Re-include only directories (no files):
+# !/skeleton/
+# !/skeleton/**/
+#
+# 11) Nested .gitignore pattern (root controls what is re-included)
+# Ignore contents of .ace/, but keep its local .gitignore trackable:
+# /.ace/*
+# !/.ace/.gitignore
+#
+# Optional explicit re-include(s) managed only from root .gitignore:
+# !/.ace/keep-me.txt
+#
+# 12) Nested .gitignore pattern (allow local .gitignore to manage that directory)
+# Root .gitignore must unignore the parent directory first:
+# /.ace/*
+# !/.ace/
+# !/.ace/.gitignore
+#
+# Then in .ace/.gitignore you can define local rules, for example:
+# *
+# !.gitignore
+# !keep/**
+#
+# Validate directory pattern behavior:
+# git check-ignore -v path/to/dir/
+
+
+# ----------------------------------------------------------------------------
+# Environment and secrets
+# ----------------------------------------------------------------------------
+.env
+.env.*
+.venv/
+.venv313/
+ENV/
+env/
+env.bak/
+venv/
+venv.bak/
+
+*.encryption.key
+*.fernet.key
+*.key
+.key
+**/secrets/**
+
+# ----------------------------------------------------------------------------
+# Python
+# ----------------------------------------------------------------------------
+.Python
+__pycache__/
+**/__pycache__/
+
+*$py.class
+*.py,cover
+*.py[cod]
+*.pyc.*
+*.pyd
+*.pyo
+*.so
+
+.coverage
+.coverage.*
+.dmypy.json
+.hypothesis/
+.ipynb_checkpoints/
+.mypy_cache/
+.mypy_report/
+.nox/
+.pybuilder/
+.pyre/
+.pytest_cache/
+.pytype/
+.ruff_cache/
+.tox/
+
+**/.mypy_cache/
+**/.pytest_cache/
+**/.ruff_cache/
+
+coverage.xml
+dmypy.json
+htmlcov/
+
+# ----------------------------------------------------------------------------
+# Python build and packaging
+# ----------------------------------------------------------------------------
+*.egg
+*.egg-info/
+.eggs/
+.installed.cfg
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+lib/
+lib64/
+parts/
+pip-wheel-metadata/
+sdist/
+share/python-wheels/
+var/
+wheels/
+
+# ----------------------------------------------------------------------------
+# JavaScript / Node / Next.js
+# ----------------------------------------------------------------------------
+.next/
+.pnp.*
+.pnp.js
+node_modules/
+npm-debug.log*
+out/
+yarn-debug.log*
+yarn-error.log*
+
+# ----------------------------------------------------------------------------
+# Logs, temp, and local data
+# ----------------------------------------------------------------------------
+
+*.temp
+*.tmp
+
+logs/
+pip-delete-this-directory.txt
+pip-log.txt
+temp/
+tmp/
+
+# ----------------------------------------------------------------------------
+# Data files and directories (ignore all, but can be overridden by specific allowlist rules if needed)
+# ----------------------------------------------------------------------------
+
+!data/                 # Keep the data directory itself, but ignore its contents (managed by data/.gitignore)
+
+# ----------------------------------------------------------------------------
+# Ignore common database and log file types at any depth:
+# ----------------------------------------------------------------------------
+
+*.db
+*.db-journal
+*.db-shm
+*.db-wal
+*.log
+*.sqlite
+*.sqlite3
+
+
+# ----------------------------------------------------------------------------
+# Tool runtime and generated working directories
+# ----------------------------------------------------------------------------
+# .ace runtime artifacts: ignore all generated content, keep nested .gitignore controls.
+/.ace/*
+!/.ace/.gitignore
+!/.ace/artifacts/
+!/.ace/artifacts/.gitignore
+!/.ace/data/
+!/.ace/data/.gitignore
+!/.ace/logs/
+!/.ace/logs/.gitignore
+
+!.ace-data/             # Keep the .ace-data directory itself, but ignore its contents (managed by .ace-data/.gitignore)
+.agent_workspace/
+!.agents/               # Keep the .agents directory itself, but ignore its contents (managed by .agents/.gitignore)
+!.agents-backups/       # Keep the .agents-backups directory itself, but ignore its contents (managed by .agents-backups/.gitignore)
+.artifacts/
+.checkpoints/
+.codeql_db/
+!.config/               # Keep the .config directory itself, but ignore its contents (managed by .config/.gitignore)
+.gitnexus/
+.graphify/
+.idempotency_store/
+.jscpd/
+.opencode/
+.scannerwork/
+.temp/
+.tmp/
+!.tools/              # Keep the .tools directory itself, but ignore its contents (managed by .tools/.gitignore)
+!_ops/                # Keep the _ops directory itself, but ignore its contents (managed by _ops/.gitignore)
+artifacts/
+pipeline_output/
+
+# ----------------------------------------------------------------------------
+# Editors, OS, and AI tool metadata
+# ----------------------------------------------------------------------------
+*~
+*.swo
+*.swp
+.DS_Store
+.agent-prompts
+.claude/
+.codex/
+.cursor/
+.idea/
+.playwright-mcp/
+.qwen/
+.vscode/
+Thumbs.db
+gemini/
+grok/
+
+
+# ----------------------------------------------------------------------------
+# Temporal directories for in-progress work and reference materials; not intended for long-term storage
+# ----------------------------------------------------------------------------
+.external_repos/
+_ai_agent/
+_ai_agent_archive/
+_copied/
+_legacy_archive/
+
+
+# ----------------------------------------------------------------------------
+# Reference Lib for cloning and reaping and reference content, repos and code not intended for long-term storage
+# ----------------------------------------------------------------------------
+!/_reference_lib/                 # Keep the _reference_lib directory itself, but ignore its contents (managed by _reference_lib/.gitignore)
+!**/_reference_lib/               # Keep any _reference_lib directory at any depth, but ignore its contents (managed by that directory's own .gitignore)
+!/.reference_lib/                 # Keep the .reference_lib directory itself, but ignore its contents (managed by .reference_lib/.gitignore)
+!**/.reference_lib/               # Keep any .reference_lib directory at any depth, but ignore its contents (managed by that directory's own .gitignore)
+!/docs/_reference_lib_docs/       # Keep the docs/_reference_lib_docs directory itself, but ignore its contents (managed by docs/_reference_lib_docs/.gitignore)
+!**/docs/_reference_lib_docs/     # Keep any docs/_reference_lib_docs directory at any depth, but ignore its contents (managed by that directory's own .gitignore)
+
+
+# ----------------------------------------------------------------------------
+# Repository stubs and reference materials
+# ----------------------------------------------------------------------------
+/.github_references/
+**/.github_references/
+!/.github_references/
+!**/.github_references/
+!/.github_references/.gitignore
+!**/.github_references/.gitignore
+
+/docs/implementation/instructions/reference_repos/
+**/docs/implementation/instructions/reference_repos/
+!/docs/implementation/instructions/reference_repos/
+!**/docs/implementation/instructions/reference_repos/
+!/docs/implementation/instructions/reference_repos/.gitignore
+!**/docs/implementation/instructions/reference_repos/.gitignore
+/reference_repos/
+**/reference_repos/
+!/reference_repos/
+!**/reference_repos/
+!/reference_repos/.gitignore
+!**/reference_repos/.gitignore
+
+# ----------------------------------------------------------------------------
+# Generated reports and outputs
+# ----------------------------------------------------------------------------
+capability_inventory_manifest.json
+integrated_compliance_summary.json
+interactive_design_compliance.json
+interactive_policy_controls.json
+layered_scan_results.json
+out*.json
+out*.txt
+out.tar
+remediation_cycle_report.json
+semgrep_report.sarif
+
+# ----------------------------------------------------------------------------
+# Git rewrite artifacts
+# ----------------------------------------------------------------------------
+.git-rewrite/
